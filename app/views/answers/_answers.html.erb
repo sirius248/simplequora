@@ -1,0 +1,10 @@
+<% @answers.each do |a| %>
+  <div class="row" style="margin: 0px;">
+    <div class="col-md-12 question">
+      <h3><%= link_to a.question.title, question_path(a.question) %></h3>
+      <p><%= a.content %></p>
+    </div>
+  </div>
+  
+  <hr/>
+<% end %>

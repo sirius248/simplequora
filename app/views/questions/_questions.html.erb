@@ -1,0 +1,18 @@
+<% @questions.each do |q| %>
+  <div class="row" style="margin: 0px;">
+    <div class="col-md-12 question">
+      <div class="row">
+        <div class="col-md-10">
+          <h3><%= link_to q.title, question_path(q) %></h3>
+        </div>
+        <div class="col-md-2" style="margin-top: 20px;">
+          <b>Like:</b> <%= q.get_likes.size %> <br/>
+          <b>Dislike:</b> <%= q.get_dislikes.size %>
+        </div>
+      </div>
+      <p><%= q.content %></p>
+    </div>
+  </div>
+  
+  <hr/>
+<% end %>

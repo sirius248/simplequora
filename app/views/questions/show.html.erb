@@ -1,0 +1,133 @@
+<div class="row">
+  <div class="col-md-12">
+    <h3><%= @question.title %></h3>
+    <div class="row">
+      <div class="col-md-4">
+        <button data-vote-url="<%= up_vote_path(@question) %>" data-type="Question" class="vote">Like</button>
+        <button data-vote-url="<%= down_vote_path(@question) %>" data-type="Question" class="vote">Dislike</button>
+      </div>
+      <div class="col-md-3">
+        <div class="row">
+          <div class="col-md-6">
+            <b>Like:</b> <span id="view_up_count"><%= @question.get_likes.size %></span>
+          </div>
+          <div class="col-md-6">
+            <b>Dislke:</b> <span id="view_down_count"><%= @question.get_dislikes.size %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <br/>
+    <p><%= @question.content %></p>
+
+    <h4><%= link_to "Answer the question", new_question_answer_path(@question) %></h4>
+    <hr/>
+
+    <h3>Anwsers:</h3>
+    <% if @question.answers.blank? %>
+      <h5>No one has answer this question.</h5>
+    <% end %>
+    <% @question.answers.each do |a| %>
+      <div class="row" style="margin: 0px;">
+        <div id="Answer_<%= a.id %>" class="col-md-12 answer">
+          <b><%= a.user.email %></b> <i>anwersed to this question</i> <br/>
+          <%= a.content %>
+
+          <div class="row">
+            <div class="col-md-4">
+              <button data-vote-url="<%= up_vote_path(a) %>" data-type="Answer" class="vote">Like</button>
+              <button data-vote-url="<%= down_vote_path(a) %>" data-type="Answer" class="vote">Dislike</button>
+            </div>
+            <div class="col-md-3">
+              <div class="row">
+                <div class="col-md-6">
+                  <b>Like:</b> <span class="answer_like"><%= a.get_likes.size %></span>
+                </div>
+                <div class="col-md-6">
+                  <b>Dislke:</b> <span class="answer_dislike"><%= a.get_dislikes.size %></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <br/>
+          <div class="row">
+            <div class="col-md-offset-2 col-md-10">
+
+              <% a.comments.each do |c| %>
+                <%= c.comment %>
+                <hr/>
+              <% end %>
+
+              <% if signed_in? %>
+                <%= form_tag(answer_comment_path(a), method: :post) do %>
+                    <div class="form-group">
+                      <%= text_area_tag :content %>
+                    </div>
+                    <%= hidden_field_tag :answer_id, a.id %>
+                    <%= submit_tag "Comment" %>
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    <% end %>
+
+    <hr/>
+    <h3>Comments:</h3>
+
+    <% if signed_in? %>
+      <%= form_tag(new_comment_path, method: :post) do %>
+          <div class="form-group">
+            <%= text_area_tag :content %>
+          </div>
+          <%= hidden_field_tag :question_id, @question.id %>
+          <%= submit_tag "Comment" %>
+      <% end %>
+    <% end %>
+
+    <% @question.comments.each do |c| %>
+      <div class="row <%= cycle("odd", "even") -%>" style="margin-left: 0px;">
+        <div class="col-md-8 comment">
+          <p><%= c.comment %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<style type="text/css">
+  .answer{
+    background-color: #F8F8F8;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .comment{
+    border: 1px solid rgb(223, 223, 223);
+    margin-top: 10px;
+    padding: 10px;
+  }
+</style>
+
+<script type="text/javascript">
+  $('.vote').on('click', function(){
+    var $this = $(this);
+    $.post($this.data("vote-url"), { data: $this.data('type') })
+     .done(function(result){
+        if($this.data('type') == 'Question'){
+          $('#view_up_count').text(result.like);
+          $('#view_down_count').text(result.dislike);
+        }
+
+        if($this.data('type') == 'Answer'){
+          var id = "#Answer_" + result.id;
+          $(id).find('.answer_like').text(result.like);
+          $(id).find('.answer_dislike').text(result.dislike);
+        }
+     });
+  });
+</script>

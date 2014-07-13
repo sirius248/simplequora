@@ -1,0 +1,10 @@
+<%= form_for @question, role: 'form' do |f| %>
+  <div class="form-group">
+    <%= f.label "Question" %>
+    <%= f.text_area :content, class: 'form-control' %>
+  </div>
+
+  <%= f.hidden_field :user_id, value: current_user.id %>
+
+  <%= f.submit "Create", class: 'btn btn-primary' %>
+<% end %>
